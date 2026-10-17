@@ -30,7 +30,7 @@ function escapeXml(value) {
   })[character]);
 }
 
-router.get('/robots.txt', (req, res, next) => {
+function getRobotsTxtHandler(req, res, next) {
   try {
     const origin = getRequestSiteOrigin(req);
     res.type('text/plain').send([
@@ -44,9 +44,9 @@ router.get('/robots.txt', (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}
 
-router.get('/sitemap.xml', async (req, res, next) => {
+async function getSitemapXmlHandler(req, res, next) {
   try {
     const origin = getRequestSiteOrigin(req);
     const staticPaths = [
@@ -79,7 +79,12 @@ router.get('/sitemap.xml', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}
+
+router.get('/robots.txt', getRobotsTxtHandler);
+router.get('/sitemap.xml', getSitemapXmlHandler);
+router.getRobotsTxtHandler = getRobotsTxtHandler;
+router.getSitemapXmlHandler = getSitemapXmlHandler;
 
 router.get('/universities', async (req, res, next) => {
   try {

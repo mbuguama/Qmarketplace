@@ -87,6 +87,8 @@ app.use('/api/contact', rateLimit({
 
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
+app.get(['/robots.txt', '/api/robots.txt'], publicRoutes.getRobotsTxtHandler);
+app.get(['/sitemap.xml', '/api/sitemap.xml'], publicRoutes.getSitemapXmlHandler);
 app.use('/api', publicRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/checkout', checkoutRoutes);
