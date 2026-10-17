@@ -346,11 +346,17 @@ async function initializeUpload(root, apiRequest, escapeHtml, showError) {
         method: 'POST',
         body: JSON.stringify({ contentType: 'application/pdf', size: file.size })
       });
-      const uploaded = await fetch(upload.url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/pdf' },
-        body: file
-      });
+      let uploaded;
+      try {
+        uploaded = await fetch(upload.url, {
+          method: 'PUT',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/pdf' },
+          body: file
+        });
+      } catch {
+        throw new Error('The file could not be sent to private storage from this browser. Confirm the R2 bucket allows PUT from this site with the Content-Type header, then retry.');
+      }
       if (!uploaded.ok) throw new Error('The file upload failed. Check the R2 bucket CORS settings and retry.');
       message.textContent = 'Applying the watermark and generating a limited preview...';
       const payload = {

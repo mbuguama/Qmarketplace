@@ -5,6 +5,46 @@ const materialVariantKeyPatterns = {
   watermarked: /^materials\/watermarked\/[0-9a-f-]{36}\.pdf$/i
 };
 
+const unsupportedChecksumHeaders = [
+  'x-amz-checksum-crc32',
+  'x-amz-checksum-crc32c',
+  'x-amz-checksum-sha1',
+  'x-amz-checksum-sha256',
+  'x-amz-sdk-checksum-algorithm'
+];
+
+let browserUploadCorsSync;
+
+function getBrowserUploadCorsConfiguration() {
+  return {
+    CORSRules: [
+      {
+        AllowedOrigins: ['*'],
+        AllowedMethods: ['GET', 'PUT', 'HEAD'],
+        AllowedHeaders: ['content-type'],
+        ExposeHeaders: ['ETag'],
+        MaxAgeSeconds: 86400
+      }
+    ]
+  };
+}
+
+function stripUnsupportedChecksumHeaders(client) {
+  client.middlewareStack.add(
+    (next) => async (args) => {
+      const headers = args.request && args.request.headers;
+      if (headers) {
+        for (const name of Object.keys(headers)) {
+          if (unsupportedChecksumHeaders.includes(name.toLowerCase())) delete headers[name];
+        }
+      }
+      return next(args);
+    },
+    { step: 'build', name: 'stripR2UnsupportedChecksumHeaders' }
+  );
+  return client;
+}
+
 function getStorageClient() {
   const {
     R2_ENDPOINT,
@@ -30,14 +70,16 @@ function getStorageClient() {
     throw error;
   }
   const { S3Client } = require('@aws-sdk/client-s3');
-  return new S3Client({
+  return stripUnsupportedChecksumHeaders(new S3Client({
     region: 'auto',
     endpoint: R2_ENDPOINT,
     credentials: {
       accessKeyId: R2_ACCESS_KEY_ID,
       secretAccessKey: R2_SECRET_ACCESS_KEY
-    }
-  });
+    },
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED'
+  }));
 }
 
 function getBucket() {
@@ -70,7 +112,24 @@ async function createMaterialDownloadUrl(material) {
   return getSignedUrl(client, command, { expiresIn: 300 });
 }
 
+async function ensureBrowserUploadCors() {
+  if (!browserUploadCorsSync) {
+    browserUploadCorsSync = (async () => {
+      const { PutBucketCorsCommand } = require('@aws-sdk/client-s3');
+      await getStorageClient().send(new PutBucketCorsCommand({
+        Bucket: getBucket(),
+        CORSConfiguration: getBrowserUploadCorsConfiguration()
+      }));
+    })().catch((error) => {
+      browserUploadCorsSync = null;
+      console.error('Could not update R2 bucket CORS for browser uploads:', error);
+    });
+  }
+  return browserUploadCorsSync;
+}
+
 async function createMaterialUploadUrl() {
+  await ensureBrowserUploadCors();
   const client = getStorageClient();
   const { PutObjectCommand } = require('@aws-sdk/client-s3');
   const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
@@ -79,7 +138,10 @@ async function createMaterialUploadUrl() {
     Bucket: getBucket(),
     Key: key,
     ContentType: 'application/pdf'
-  }), { expiresIn: 300 });
+  }), {
+    expiresIn: 300,
+    unsignableHeaders: new Set(unsupportedChecksumHeaders)
+  });
   return { key, url, expiresIn: 300 };
 }
 
@@ -143,6 +205,7 @@ module.exports = {
   createMaterialDownloadUrl,
   createMaterialUploadUrl,
   deletePrivateObjects,
+  getBrowserUploadCorsConfiguration,
   getPrivateObjectBuffer,
   pipePrivateObject,
   putPrivateObject
