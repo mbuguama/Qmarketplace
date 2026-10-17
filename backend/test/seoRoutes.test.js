@@ -69,3 +69,15 @@ test('also serves sitemap.xml at /api/sitemap.xml for backwards compatibility', 
     await close();
   }
 });
+
+test('rejects direct preview PDF downloads with 403', async () => {
+  const { url, close } = await startServer(app);
+  try {
+    const response = await fetch(`${url}/api/materials/any-material-id/preview`);
+    assert.equal(response.status, 403);
+    const body = await response.json();
+    assert.ok(body.message.includes('Preview downloads are disabled'));
+  } finally {
+    await close();
+  }
+});

@@ -124,10 +124,9 @@ async function renderPreviewPage(source, pageNumber) {
     }
 
     const page = await document.getPage(pageNumber);
-    await page.getTextContent();
     const baseViewport = page.getViewport({ scale: 1 });
     const scale = Math.min(
-      1,
+      1.5,
       PREVIEW_IMAGE_MAX_WIDTH / baseViewport.width,
       PREVIEW_IMAGE_MAX_HEIGHT / baseViewport.height
     );

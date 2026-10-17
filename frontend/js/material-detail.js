@@ -47,7 +47,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = `
       <section class="detail-preview">
         ${material.hasPreview
-          ? `<div class="pdf-preview" data-pdf-document="/api/materials/${encodeURIComponent(material.id)}/preview/pages" data-page-count="${Math.min(Number(material.pages) || 3, 3)}"><div class="pdf-preview-heading"><span class="badge">Watermarked preview</span><span class="small">First 3 pages · original file remains private</span></div><div class="pdf-page-container"><img data-pdf-image alt="Watermarked page of ${escapeHtml(material.title)}"></div><div class="pdf-preview-controls"><button class="btn btn-secondary" type="button" data-pdf-previous disabled>Previous</button><span data-pdf-page-label role="status">Loading PDF preview…</span><button class="btn btn-secondary" type="button" data-pdf-next disabled>Next</button></div><a class="preview-open-link" href="/api/materials/${encodeURIComponent(material.id)}/preview" target="_blank" rel="noopener">Open watermarked preview PDF</a></div>`
+          ? `<div class="pdf-preview" data-pdf-document="/api/materials/${encodeURIComponent(material.id)}/preview/pages" data-page-count="${Math.min(Number(material.pages) || 3, 3)}">
+              <div class="pdf-preview-heading">
+                <span class="badge">Watermarked preview</span>
+                <span class="small">First ${Math.min(Number(material.pages) || 3, 3)} pages · Full document available upon purchase</span>
+              </div>
+              <div class="pdf-page-container">
+                <img data-pdf-image alt="Watermarked page of ${escapeHtml(material.title)}">
+              </div>
+              <div class="pdf-preview-controls">
+                <div class="pdf-controls-nav">
+                  <button class="btn btn-secondary" type="button" data-pdf-previous disabled>Previous</button>
+                  <span data-pdf-page-label role="status">Loading preview…</span>
+                  <button class="btn btn-secondary" type="button" data-pdf-next disabled>Next</button>
+                </div>
+                <div class="pdf-controls-zoom">
+                  <button class="btn btn-secondary btn-icon" type="button" data-pdf-zoom-out title="Zoom out" aria-label="Zoom out">−</button>
+                  <span data-pdf-zoom-level class="zoom-label">100%</span>
+                  <button class="btn btn-secondary btn-icon" type="button" data-pdf-zoom-in title="Zoom in" aria-label="Zoom in">+</button>
+                  <button class="btn btn-secondary btn-sm" type="button" data-pdf-fit-width title="Reset zoom">Reset</button>
+                </div>
+              </div>
+            </div>`
           : `<div class="detail-preview-paper"><span class="badge">${escapeHtml(material.fileFormat || 'Digital material')}</span><h2>${escapeHtml(material.title)}</h2><p>The processed PDF preview is not available yet. An administrator must upload or process the source PDF before it can be previewed or purchased.</p></div>`}
       </section>
       <section class="detail-info">

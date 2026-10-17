@@ -25,14 +25,38 @@ function renderDetailPreview(container) {
   const label = container.querySelector('[data-pdf-page-label]');
   const previous = container.querySelector('[data-pdf-previous]');
   const next = container.querySelector('[data-pdf-next]');
+  const zoomIn = container.querySelector('[data-pdf-zoom-in]');
+  const zoomOut = container.querySelector('[data-pdf-zoom-out]');
+  const resetZoom = container.querySelector('[data-pdf-fit-width]');
+  const zoomLabel = container.querySelector('[data-pdf-zoom-level]');
   if (!image || !label || !previous || !next) return;
   const pageCount = Math.max(1, Math.min(Number(container.dataset.pageCount) || 3, 3));
   let currentPage = 1;
   let loadingPage;
+  let currentZoom = 100;
+
+  const preloadAll = () => {
+    for (let p = 1; p <= pageCount; p++) {
+      const preloadImg = new Image();
+      preloadImg.src = `${container.dataset.pdfDocument}/${p}.png`;
+    }
+  };
+
+  const applyZoom = (zoom) => {
+    currentZoom = Math.max(60, Math.min(200, zoom));
+    image.style.maxWidth = currentZoom > 100 ? `${currentZoom}%` : '100%';
+    image.style.width = currentZoom > 100 ? `${currentZoom}%` : '100%';
+    if (zoomLabel) zoomLabel.textContent = `${currentZoom}%`;
+  };
+
+  if (zoomIn) zoomIn.addEventListener('click', () => applyZoom(currentZoom + 20));
+  if (zoomOut) zoomOut.addEventListener('click', () => applyZoom(currentZoom - 20));
+  if (resetZoom) resetZoom.addEventListener('click', () => applyZoom(100));
 
   const showPage = (pageNumber) => {
     currentPage = pageNumber;
     loadingPage = pageNumber;
+    image.style.opacity = '0.6';
     image.src = `${container.dataset.pdfDocument}/${pageNumber}.png`;
     image.alt = `Watermarked preview page ${pageNumber} of ${pageCount}`;
     label.textContent = `Loading page ${pageNumber}…`;
@@ -42,12 +66,16 @@ function renderDetailPreview(container) {
 
   image.addEventListener('load', () => {
     if (loadingPage !== currentPage) return;
+    image.style.opacity = '1';
     label.textContent = `Page ${currentPage} of ${pageCount}`;
     previous.disabled = currentPage <= 1;
     next.disabled = currentPage >= pageCount;
+    container.dataset.previewState = 'ready';
+    preloadAll();
   });
   image.addEventListener('error', () => {
     if (loadingPage !== currentPage) return;
+    image.style.opacity = '1';
     label.textContent = 'This preview page could not be loaded.';
     previous.disabled = currentPage <= 1;
     next.disabled = currentPage >= pageCount;

@@ -146,14 +146,27 @@ router.get('/materials/:id', async (req, res, next) => {
   }
 });
 
-router.get('/materials/:id/preview', async (req, res, next) => {
-  try {
-    const previewKey = await getMaterialPreviewKey(req.params.id);
-    if (!previewKey) return res.status(404).json({ message: 'A processed preview is not available for this material.' });
-    await pipePrivateObject(previewKey, req, res);
-  } catch (error) {
-    return next(error);
+const previewPageCache = new Map();
+const MAX_PREVIEW_PAGE_CACHE = 150;
+
+function getCachedPreviewPage(key) {
+  if (!previewPageCache.has(key)) return null;
+  const entry = previewPageCache.get(key);
+  previewPageCache.delete(key);
+  previewPageCache.set(key, entry);
+  return entry;
+}
+
+function setCachedPreviewPage(key, buffer) {
+  if (previewPageCache.size >= MAX_PREVIEW_PAGE_CACHE) {
+    const oldestKey = previewPageCache.keys().next().value;
+    previewPageCache.delete(oldestKey);
   }
+  previewPageCache.set(key, buffer);
+}
+
+router.get('/materials/:id/preview', (req, res) => {
+  return res.status(403).json({ message: 'Preview downloads are disabled. Please use the on-page document preview.' });
 });
 
 router.get('/materials/:id/preview/pages/:page.png', async (req, res, next) => {
@@ -161,16 +174,43 @@ router.get('/materials/:id/preview/pages/:page.png', async (req, res, next) => {
     if (!/^[1-3]$/.test(req.params.page)) {
       return res.status(400).json({ message: 'Preview page must be a whole number between 1 and 3.' });
     }
+    const pageNum = Number(req.params.page);
+    const cacheKey = `${req.params.id}:${pageNum}`;
+    const cached = getCachedPreviewPage(cacheKey);
+    if (cached) {
+      res.type('png');
+      res.setHeader('Content-Disposition', 'inline; filename="study-material-preview.png"');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+      return res.send(cached);
+    }
+
     const previewKey = await getMaterialPreviewKey(req.params.id);
     if (!previewKey) {
       return res.status(404).json({ message: 'A processed preview is not available for this material.' });
     }
     const pdf = await getPrivateObjectBuffer(previewKey);
-    const image = await renderPreviewPage(pdf, Number(req.params.page));
+    const image = await renderPreviewPage(pdf, pageNum);
+    setCachedPreviewPage(cacheKey, image);
+
+    if (pageNum === 1) {
+      Promise.resolve().then(async () => {
+        for (const p of [2, 3]) {
+          const nextKey = `${req.params.id}:${p}`;
+          if (!previewPageCache.has(nextKey)) {
+            try {
+              const nextImg = await renderPreviewPage(pdf, p);
+              setCachedPreviewPage(nextKey, nextImg);
+            } catch (_) {}
+          }
+        }
+      }).catch(() => {});
+    }
+
     res.type('png');
     res.setHeader('Content-Disposition', 'inline; filename="study-material-preview.png"');
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
     return res.send(image);
   } catch (error) {
     return next(error);
