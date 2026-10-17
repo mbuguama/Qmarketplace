@@ -14,6 +14,7 @@ const userRoutes = require('./routes/users');
 const checkoutRoutes = require('./routes/checkout');
 const adminRoutes = require('./routes/admin');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
+const { getPublicSiteOrigins } = require('./utils/siteUrl');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -37,10 +38,10 @@ app.use(helmet({
 }));
 
 const allowedOrigins = new Set([
-  process.env.FRONTEND_URL,
+  ...getPublicSiteOrigins(),
   'http://localhost:4000',
   'http://127.0.0.1:4000'
-].filter(Boolean));
+]);
 
 app.use(cors({
   origin(origin, callback) {

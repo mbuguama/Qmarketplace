@@ -12,21 +12,12 @@ const {
 const { adminRequired, authRequired } = require('../middleware/auth');
 const { getPrivateObjectBuffer, pipePrivateObject } = require('../services/storageService');
 const { renderPreviewPage } = require('../services/pdfProcessingService');
+const { getPublicSiteOrigin } = require('../utils/siteUrl');
 
 const router = express.Router();
 
-function getPublicSiteOrigin(req) {
-  const configuredUrl = process.env.FRONTEND_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  const candidate = configuredUrl
-    ? (configuredUrl.includes('://') ? configuredUrl : `https://${configuredUrl}`)
-    : (!process.env.VERCEL ? `${req.protocol}://${req.get('host')}` : null);
-  if (!candidate) throw new Error('Set FRONTEND_URL or VERCEL_PROJECT_PRODUCTION_URL to serve sitemap and robots metadata.');
-
-  const siteUrl = new URL(candidate);
-  if (!['http:', 'https:'].includes(siteUrl.protocol) || siteUrl.username || siteUrl.password) {
-    throw new Error('The configured public site URL must be an HTTP(S) origin without credentials.');
-  }
-  return siteUrl.origin;
+function getRequestSiteOrigin(req) {
+  return getPublicSiteOrigin() || `${req.protocol}://${req.get('host')}`;
 }
 
 function escapeXml(value) {
@@ -41,7 +32,7 @@ function escapeXml(value) {
 
 router.get('/robots.txt', (req, res, next) => {
   try {
-    const origin = getPublicSiteOrigin(req);
+    const origin = getRequestSiteOrigin(req);
     res.type('text/plain').send([
       'User-agent: *',
       'Allow: /',
@@ -57,7 +48,7 @@ router.get('/robots.txt', (req, res, next) => {
 
 router.get('/sitemap.xml', async (req, res, next) => {
   try {
-    const origin = getPublicSiteOrigin(req);
+    const origin = getRequestSiteOrigin(req);
     const staticPaths = [
       '/',
       '/materials.html',

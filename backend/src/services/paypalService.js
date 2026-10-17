@@ -5,6 +5,7 @@ const {
   getOrderByPaymentId,
   markOrderPaid
 } = require('./dataService');
+const { getPublicSiteOrigin } = require('../utils/siteUrl');
 
 function getPayPalConfig() {
   const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
@@ -74,7 +75,7 @@ async function createPayPalCheckout({ userId, materialId }) {
     error.statusCode = 409;
     throw error;
   }
-  const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const frontendUrl = getPublicSiteOrigin() || 'http://localhost:4000';
   const paypalOrder = await paypalRequest('/v2/checkout/orders', {
     method: 'POST',
     headers: { 'PayPal-Request-Id': `qmarketplace-${userId}-${materialId}-${Date.now()}` },
