@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Find university lecture notes, exam papers, study guides, and course resources. Preview academic documents and buy study materials on QMarketplace." />
+    <title>University Study Materials, Notes &amp; Exam Papers | QMarketplace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/global.css" />
+    <link rel="stylesheet" href="./css/layout.css" />
+    <link rel="stylesheet" href="./css/components.css" />
+    <link rel="stylesheet" href="./css/marketplace.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="container topbar-inner">
+          <a href="/" class="brand">
+            <span class="brand-mark">Q</span>
+            <span>QMarketplace</span>
+          </a>
+          <nav class="nav-links" aria-label="Main navigation">
+            <a href="/">Home</a>
+            <a href="/materials.html">Materials</a>
+            <a href="/universities.html">Universities</a>
+            <a href="/about.html">About</a>
+            <a href="/faq.html">FAQ</a>
+          </nav>
+          <div class="topbar-actions">
+            <a class="btn btn-secondary" href="/checkout.html">Checkout</a>
+            <a class="btn btn-primary" data-auth-link href="/login.html">Login</a>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="container hero-panel">
+            <div class="hero-grid">
+              <div>
+                <div class="badge">An academic resource marketplace</div>
+                  <h1>Find the study material behind your next breakthrough.</h1>
+                  <p>Search course notes, exam papers and study summaries shared for university learning.</p>
+                  <form class="hero-search" data-search-form role="search">
+                    <label class="visually-hidden" for="home-search">Search by course, subject, or title</label>
+                    <input id="home-search" type="search" name="q" placeholder="Search by course, subject, or title" />
+                    <button class="btn btn-primary" type="submit">Search materials</button>
+                  </form>
+                  <div class="hero-actions">
+                    <a href="/materials.html" class="btn btn-primary">Browse materials</a>
+                    <a href="/universities.html" class="btn btn-secondary">Explore universities</a>
+                </div>
+              </div>
+                <div class="hero-visual" aria-hidden="true">
+                  <span class="hero-visual-label">Study resource / 01</span>
+                  <div class="hero-visual-document">
+                    <span class="badge">Course notes</span>
+                    <h2>Make your next study session count.</h2>
+                    <div class="hero-visual-line"></div>
+                    <div class="hero-visual-line"></div>
+                    <div class="hero-visual-line short"></div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <div class="badge">Featured</div>
+                <h2>Popular academic resources</h2>
+              </div>
+              <a href="/materials.html" class="link-inline">View all</a>
+            </div>
+            <div class="feature-rail" data-featured-list></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <div class="badge">Browse institutions</div>
+                <h2>Explore universities</h2>
+              </div>
+            </div>
+            <div class="logo-row" data-university-list></div>
+          </div>
+        </section>
+
+        <section class="section section-muted">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <div class="badge">How it works</div>
+                <h2>A clear path from search to study</h2>
+              </div>
+            </div>
+            <div class="grid grid-3">
+              <article class="process-card"><span>01</span><h3>Find your course</h3><p>Search a subject, course code, institution, or resource title.</p></article>
+              <article class="process-card"><span>02</span><h3>Review the details</h3><p>Check the material description, format, page count, and price before checkout.</p></article>
+              <article class="process-card"><span>03</span><h3>Access your purchase</h3><p>After payment is confirmed, view your order and access available downloads.</p></article>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="container footer-grid">
+          <div>
+            <div class="brand"><span class="brand-mark">Q</span><span>QMarketplace</span></div>
+            <p>Premium academic study resources built for serious students.</p>
+          </div>
+          <div>
+            <h3>Marketplace</h3>
+            <div class="footer-list">
+              <a href="/materials.html">Materials</a>
+              <a href="/universities.html">Universities</a>
+              <a href="/courses.html">Courses</a>
+            </div>
+          </div>
+          <div>
+            <h3>Company</h3>
+            <div class="footer-list">
+              <a href="/about.html">About</a>
+              <a href="/contact.html">Contact</a>
+              <a href="/faq.html">FAQ</a>
+            </div>
+          </div>
+          <div>
+            <h3>Legal</h3>
+            <div class="footer-list">
+              <a href="/privacy.html">Privacy</a>
+              <a href="/terms.html">Terms</a>
+              <a href="/refund-policy.html">Refunds</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script src="./js/api.js"></script>
+    <script src="./js/seo.js"></script>
+    <script src="./js/navigation.js"></script>
+    <script src="./js/search.js"></script>
+    <script src="./js/home.js"></script>
+    <script src="./js/pdf-previews.js"></script>
+  </body>
+</html>

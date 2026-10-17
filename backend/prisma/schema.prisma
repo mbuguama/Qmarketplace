@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String          @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String          @unique
+  passwordHash String
+  role         String          @default("student")
+  status       String          @default("active")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  orders       Order[]
+  materials    Material[]
+  auditEvents  AdminAuditLog[]
+}
+
+model University {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  location    String
+  description String
+  country     String     @default("United States")
+  state       String?
+  logoUrl     String?
+  createdAt   DateTime   @default(now())
+  courses     Course[]
+  materials   Material[]
+}
+
+model Course {
+  id           String     @id @default(uuid())
+  title        String
+  code         String
+  description  String
+  semester     String?
+  level        String
+  universityId String
+  university   University @relation(fields: [universityId], references: [id])
+  materials    Material[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([universityId, code])
+}
+
+model Material {
+  id               String     @id @default(uuid())
+  title            String
+  type             String
+  description      String
+  price            Decimal    @db.Decimal(10, 2)
+  pages            Int
+  academicYear     String?
+  fileFormat       String?
+  status           String     @default("active")
+  featured         Boolean    @default(false)
+  downloadUrl      String?
+  originalFileKey  String?
+  previewUrl       String?
+  fileSize         Int?
+  processingStatus String     @default("complete")
+  universityId     String
+  university       University @relation(fields: [universityId], references: [id])
+  courseId         String?
+  course           Course?    @relation(fields: [courseId], references: [id])
+  sellerId         String?
+  seller           User?      @relation(fields: [sellerId], references: [id])
+  orders           Order[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+model Order {
+  id                 String    @id @default(uuid())
+  userId             String
+  user               User      @relation(fields: [userId], references: [id])
+  materialId         String
+  material           Material  @relation(fields: [materialId], references: [id])
+  amount             Decimal   @db.Decimal(10, 2)
+  currency           String    @default("USD")
+  status             String    @default("pending")
+  paymentId          String?
+  provider           String    @default("paypal")
+  cancelledAt        DateTime?
+  cancellationReason String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  materialId String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+}
+
+model ContactQuery {
+  id            String   @id @default(uuid())
+  name          String
+  email         String
+  subject       String
+  message       String
+  status        String   @default("new")
+  internalNotes String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AdminAuditLog {
+  id         String   @id @default(uuid())
+  actorId    String
+  actor      User     @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  action     String
+  entityType String
+  entityId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+}

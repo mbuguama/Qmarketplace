@@ -1,0 +1,9 @@
+node_modules/
+backend/.env
+.env
+.vercel/
+coverage/
+*.log
+npm-debug.log*
+backend/prisma/*.db
+backend/prisma/*.db-journal

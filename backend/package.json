@@ -1,0 +1,37 @@
+{
+  "name": "qmarketplace-backend",
+  "version": "1.0.0",
+  "description": "QMarketplace backend API",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:deploy": "prisma migrate deploy",
+    "seed": "node prisma/seed.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
+    "@napi-rs/canvas": "^0.1.100",
+    "@prisma/client": "^6.19.3",
+    "argon2": "^0.45.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.12.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38",
+    "prisma": "^6.19.3",
+    "zod": "^4.6.7"
+  }
+}

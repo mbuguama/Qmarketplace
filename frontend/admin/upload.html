@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="robots" content="noindex, nofollow" /><title>Add material | QMarketplace</title><link rel="stylesheet" href="../css/global.css" /><link rel="stylesheet" href="../css/layout.css" /><link rel="stylesheet" href="../css/components.css" /><link rel="stylesheet" href="../css/admin.css" /></head>
+  <body><div class="admin-shell"><header class="topbar"><div class="container topbar-inner"><a href="/" class="brand"><span class="brand-mark">Q</span><span>QMarketplace</span></a><nav class="nav-links" aria-label="Main navigation"><a href="/">View marketplace</a></nav><div class="topbar-actions"><a class="btn btn-secondary" href="/logout.html" data-logout>Sign out</a></div></div></header>
+    <div class="container admin-layout"><aside class="admin-sidebar"><span class="badge">Administration</span><nav data-admin-nav aria-label="Admin navigation"></nav></aside><main class="admin-main" data-admin-root data-admin-view="upload">
+      <div class="admin-page-head"><div><span class="badge">Catalog</span><h1>Add a study material</h1><p>Upload a private PDF and provide accurate listing details.</p></div></div>
+      <form class="admin-form" data-material-form>
+        <div class="admin-form-grid">
+          <label class="field">Title<input class="input" name="title" maxlength="160" required /></label>
+          <label class="field">Type<select class="select" name="type" required><option value="">Select type</option><option>Lecture Notes</option><option>Exam Papers</option><option>Study Summaries</option><option>Problem Sets</option><option>Other</option></select></label>
+          <label class="field">Price (USD)<input class="input" name="price" type="number" min="0" max="10000" step="0.01" required /></label>
+          <label class="field">University<select class="select" name="universityId" data-upload-university required><option value="">Loading universities...</option></select></label>
+          <label class="field">Course<select class="select" name="courseId" data-upload-course><option value="">No course selected</option></select></label>
+          <label class="field">Academic year (optional)<input class="input" name="academicYear" maxlength="32" /></label>
+          <label class="field">PDF file<input class="input" name="file" type="file" accept="application/pdf,.pdf" required /><span class="small">Maximum file size: 20 MB.</span></label>
+          <label class="checkbox-row"><input type="checkbox" name="featured" value="true" /> Feature on the marketplace home page</label>
+        </div>
+        <label class="field">Description<textarea class="input" name="description" maxlength="5000" rows="5" required></textarea></label>
+        <p class="form-message" data-admin-message role="status" aria-live="polite"></p>
+        <button class="btn btn-primary" type="submit">Upload and publish</button>
+      </form>
+      <p class="small admin-note">The server counts pages, retains the private original, and creates a watermarked full PDF plus a three-page preview before publishing. Uploads require configured private R2 storage. Confirm you are authorised to distribute the file.</p>
+    </main></div>
+  </div><script src="../js/api.js"></script><script src="../js/navigation.js"></script><script src="../js/admin.js"></script></body>
+</html>

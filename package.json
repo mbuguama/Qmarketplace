@@ -1,0 +1,18 @@
+{
+  "name": "qmarketplace",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm --workspace backend run dev",
+    "start": "npm --workspace backend run start",
+    "prisma:generate": "npm --workspace backend run prisma:generate",
+    "prisma:deploy": "npm --workspace backend run prisma:deploy",
+    "seed": "npm --workspace backend run seed"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0"
+  }
+}
